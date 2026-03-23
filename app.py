@@ -6,7 +6,31 @@ import plotly.express as px
 from scipy.stats import pearsonr, ttest_ind, f_oneway
 import statsmodels.api as sm
 
+# Must be the first Streamlit command
 st.set_page_config(page_title="Data Analysis Dashboard", layout="wide")
+
+st.title("Experimental Analysis: Repulsion vs M0/M2 Ratio")
+
+# -----------------------------------------------------------------------------
+# NEW: Streamlit Info & Deployment Instructions
+# -----------------------------------------------------------------------------
+with st.expander("ℹ️ About Streamlit & Deployment Limits", expanded=True):
+    st.markdown("""
+    ### What is Streamlit?
+    Streamlit is an open-source Python framework that allows you to turn data scripts into fully interactive web applications in minutes, completely in Python and without needing front-end web development experience.
+
+    ### Free Apps & Private Repository Limits
+    Streamlit Community Cloud provides free hosting with the following allowances:
+    * **Public Apps:** You can create and deploy an **unlimited** number of free public apps.
+    * **Private Apps:** You are permitted exactly **1 free private app** per workspace. This feature allows you to deploy an app securely from a private GitHub repository without making your source code public.
+
+    ### How to Link to GitHub & Deploy
+    1. **Push to GitHub:** Commit and push your Python script (e.g., `app.py`), your `requirements.txt`, and your database (`experiment_data.parquet`) to your GitHub repository.
+    2. **Connect Account:** Go to [Streamlit Community Cloud](https://share.streamlit.io/) and sign in. You will be prompted to authorize Streamlit to access your GitHub account.
+    3. **Deploy:** Click **New app**, select your target repository and branch, and specify the main file path (e.g., `app.py`). Click **Deploy!** *Note: Once deployed, your live app will automatically update whenever you push new commits to your GitHub branch.*
+    """)
+
+st.markdown("---")
 
 # -----------------------------------------------------------------------------
 # 1. Data Generation & Loading
@@ -61,8 +85,6 @@ filtered_df = df[df['Tag'].isin(selected_tags)]
 # -----------------------------------------------------------------------------
 # 3. Main Dashboard UI
 # -----------------------------------------------------------------------------
-st.title("Experimental Analysis: Repulsion vs M0/M2 Ratio")
-
 st.subheader("Raw Data Preview")
 st.dataframe(filtered_df.head(10), use_container_width=True)
 
@@ -93,9 +115,9 @@ with col2:
         stat, p_val = ttest_ind(group1, group2)
         st.write(f"**Independent T-Test** between {selected_tags[0]} and {selected_tags[1]}:")
         st.write(f"- T-statistic: {stat:.4f}")
-        st.write(f"- $p$-value: {p_val:.4e}")
+        st.write(f"- p-value: {p_val:.4e}")
         if p_val < 0.05:
-            st.success("Result is statistically significant ($p < 0.05$).")
+            st.success("Result is statistically significant (p < 0.05).")
         else:
             st.warning("Result is not statistically significant.")
     else:
@@ -104,9 +126,9 @@ with col2:
         stat, p_val = f_oneway(*groups)
         st.write("**One-Way ANOVA** across all selected groups:")
         st.write(f"- F-statistic: {stat:.4f}")
-        st.write(f"- $p$-value: {p_val:.4e}")
+        st.write(f"- p-value: {p_val:.4e}")
         if p_val < 0.05:
-            st.success("Result is statistically significant ($p < 0.05$).")
+            st.success("Result is statistically significant (p < 0.05).")
         else:
             st.warning("Result is not statistically significant.")
 
@@ -130,7 +152,7 @@ with col3:
     
     # Pearson Correlation
     r_stat, p_val_pearson = pearsonr(filtered_df['Repulsion'], filtered_df['M0_M2_Ratio'])
-    st.write(f"**Overall Pearson Correlation ($r$)**: {r_stat:.4f} ($p$-value: {p_val_pearson:.4e})")
+    st.write(f"**Overall Pearson Correlation (r)**: {r_stat:.4f} (p-value: {p_val_pearson:.4e})")
 
 # --- Model Fitting ---
 with col4:
